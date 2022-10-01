@@ -5,17 +5,22 @@ import { useGlobalContext } from "../context/context";
 
 const Search = () => {
   const [user, setUser] = useState("");
-  // const {} = useGlobalContext();
+  const { request, error, searchGithubUser } = useGlobalContext();
   const handleSubmit = (e) => {
     e.preventDefault();
     if (user) {
+      searchGithubUser(user);
       setUser("");
-      console.log(user);
     }
   };
   return (
     <section className="section">
       <Wrapper className="section-center">
+        {error.show && (
+          <ErrorWrapper>
+            <p>{error.msg}</p>
+          </ErrorWrapper>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-control">
             <MdSearch />
@@ -25,10 +30,10 @@ const Search = () => {
               value={user}
               onChange={(e) => setUser(e.target.value)}
             />
-            <button type="submit">search</button>
+            {request > 0 && <button type="submit">search</button>}
           </div>
         </form>
-        <h3>requests: 60 / 60</h3>
+        <h3>requests: {request}/60</h3>
       </Wrapper>
     </section>
   );
