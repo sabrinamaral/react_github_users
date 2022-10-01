@@ -5,30 +5,62 @@ import { ExampleChart, Pie3D, Column3D, Bar3D, Doughnut2D } from "./Charts";
 const Repos = () => {
   const { repos } = useGlobalContext();
   let languages = repos.reduce((acc, curr) => {
-    const { language } = curr;
+    const { language, stargazers_count } = curr;
     if (!language) return acc;
     if (!acc[language]) {
-      acc[language] = { label: language, value: 1 };
+      acc[language] = { label: language, value: 1, stars: stargazers_count };
     } else {
-      acc[language] = { ...acc[language], value: acc[language].value + 1 };
+      acc[language] = {
+        ...acc[language],
+        value: acc[language].value + 1,
+        stars: acc[language].stars + 1,
+      };
     }
     return acc;
   }, {});
-  languages = Object.values(languages)
+  const mostUseLanguages = Object.values(languages)
     .sort((a, b) => {
       return b.value - a.value;
     })
     .slice(0, 5);
 
-  const chartData = [
-    { label: "Javascript", value: 64 },
-    { label: "HTML", value: 13 },
-    { label: "CSS", value: 23 },
-  ];
+  // stars per language
+  const mostPopular = Object.values(languages).sort((a, b) => {
+    return b.stars - b.stars;
+  });
+  const starsPerLanguage = mostPopular
+    .map((item) => {
+      return {
+        label: item.label,
+        value: item.stars,
+      };
+    })
+    .slice(0, 5);
+
+  // stars and forks
+
+  let { stars, forks } = repos.reduce(
+    (acc, curr) => {
+      const { forks_count, stargazers_count, name } = curr;
+      acc.stars[stargazers_count] = { label: name, value: stargazers_count };
+      acc.forks[forks_count] = { label: name, value: forks_count };
+      return acc;
+    },
+    {
+      stars: {},
+      forks: {},
+    }
+  );
+  stars = Object.values(stars).slice(-5).reverse();
+  forks = Object.values(forks).slice(-5).reverse();
+
   return (
     <section className="section">
       <Wrapper className="section-center">
-        <Pie3D data={languages} />
+        <Pie3D data={mostUseLanguages} />
+        <Column3D data={stars} />
+        <Doughnut2D data={starsPerLanguage} />
+        <Bar3D data={forks} />
         {/* <ExampleChart data={chartData} /> */}
       </Wrapper>
     </section>
