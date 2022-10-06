@@ -10,7 +10,6 @@ const Card = () => {
     name,
     company,
     blog,
-    bio,
     location,
     twitter_username,
   } = githubUser;
